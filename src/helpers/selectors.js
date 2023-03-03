@@ -1,5 +1,5 @@
 export function getAppointmentsForDay(state, day) {
-  //... returns an array of appointments for that day
+  //returns an array of appointments for that day
   let appointments = [];
   let appointmentDetails = [];
 
@@ -19,9 +19,11 @@ export function getAppointmentsForDay(state, day) {
 }
 
 export function getInterview(state, interview) {
-  let interviewObject = interview;
+  //returns an interviewObject with the interviewer name
+  let interviewObject = {};
+  interviewObject = {...interview};
 
-  if (interviewObject === null) {
+  if (interview === null) {
     return null;
   } else {
     interviewObject.interviewer = state.interviewers[interview.interviewer];
