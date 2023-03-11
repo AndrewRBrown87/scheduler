@@ -9,6 +9,7 @@ import { getInterview } from "helpers/selectors";
 import { getInterviewersForDay } from "helpers/selectors";
 
 export default function Application(props) {
+  //useState initialization
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -16,12 +17,54 @@ export default function Application(props) {
     interviewers: {}
   });
 
+  //get list of appointments for the selected day
   const dailyAppointments = getAppointmentsForDay(state, state.day);
 
+  //get list of interviewers for the selected day
   const interviewers = getInterviewersForDay(state, state.day);
 
+  //function for booking an interview
+  const bookInterview = (id, interview) => {
+    
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview }
+    };
+
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+    
+    return axios.put(`/api/appointments/${id}`, appointment)
+    .then((response) => {
+      setState({ ...state, appointments });
+    });
+  };
+
+  //function for canceling an interview
+  const cancelInterview = (id) => {
+
+    const appointment = {
+      ...state.appointments[id],
+      interview: null
+    };
+
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    }
+
+    return axios.delete(`/api/appointments/${id}`, appointment)
+    .then((response) => {
+      setState({ ...state, appointments });
+    });
+  };
+
+  //function for setting the day state
   const setDay = day => setState({ ...state, day });
 
+  //useEffect initialization
   useEffect(() => {
     Promise.all([
       axios.get('/api/days'),
@@ -32,6 +75,7 @@ export default function Application(props) {
     });
   }, []);
 
+  //create array of Appointment components
   const appointmentsArray = Object.values(dailyAppointments).map((appointmentObject) => {
     const interview = getInterview(state, appointmentObject.interview);
     
@@ -42,6 +86,8 @@ export default function Application(props) {
         time={appointmentObject.time}
         interview={interview}
         interviewers={interviewers}
+        bookInterview={(id, interview) => bookInterview(id, interview)}
+        cancelInterview={(id) => cancelInterview(id)}
       />
     );
   })
