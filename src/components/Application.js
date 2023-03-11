@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 
 import "components/Application.scss";
 import DayList from "components/DayList";
@@ -7,73 +6,22 @@ import Appointment from "components/Appointment/index.js";
 import { getAppointmentsForDay } from "helpers/selectors";
 import { getInterview } from "helpers/selectors";
 import { getInterviewersForDay } from "helpers/selectors";
+import useApplicationData from "hooks/useApplicationData";
 
 export default function Application(props) {
-  //useState initialization
-  const [state, setState] = useState({
-    day: "Monday",
-    days: [],
-    appointments: {},
-    interviewers: {}
-  });
-
-  //get list of appointments for the selected day
-  const dailyAppointments = getAppointmentsForDay(state, state.day);
+  
+  const {
+    state,
+    setDay,
+    bookInterview,
+    cancelInterview
+  } = useApplicationData();
 
   //get list of interviewers for the selected day
   const interviewers = getInterviewersForDay(state, state.day);
 
-  //function for booking an interview
-  const bookInterview = (id, interview) => {
-    
-    const appointment = {
-      ...state.appointments[id],
-      interview: { ...interview }
-    };
-
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment
-    };
-    
-    return axios.put(`/api/appointments/${id}`, appointment)
-    .then((response) => {
-      setState({ ...state, appointments });
-    });
-  };
-
-  //function for canceling an interview
-  const cancelInterview = (id) => {
-
-    const appointment = {
-      ...state.appointments[id],
-      interview: null
-    };
-
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment
-    }
-
-    return axios.delete(`/api/appointments/${id}`, appointment)
-    .then((response) => {
-      setState({ ...state, appointments });
-    });
-  };
-
-  //function for setting the day state
-  const setDay = day => setState({ ...state, day });
-
-  //useEffect initialization
-  useEffect(() => {
-    Promise.all([
-      axios.get('/api/days'),
-      axios.get('/api/appointments'),
-      axios.get('/api/interviewers')
-    ]).then((all) => {
-      setState(prev => ({...prev, days: all[0].data, appointments: all[1].data, interviewers: all[2].data}));
-    });
-  }, []);
+  //get list of appointments for the selected day
+  const dailyAppointments = getAppointmentsForDay(state, state.day);
 
   //create array of Appointment components
   const appointmentsArray = Object.values(dailyAppointments).map((appointmentObject) => {
