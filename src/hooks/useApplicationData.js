@@ -30,23 +30,24 @@ export default function useApplicationData() {
 
     //update days.spots when a new appointment is added
     const days = [];
-
     for (let i = 0; i < state.days.length; i++){
       days[i] = {...state.days[i]};
     }
 
-    if (id <= 5) {
-      days[0].spots--;
-    } else if (id <= 10) {
-      days[1].spots--;
-    } else if (id <= 15) {
-      days[2].spots--;
-    } else if (id <= 20) {
-      days[3].spots--;
-    } else {
-      days[4].spots--;
+    //check that appointment is being added (not edited)
+    if(state.appointments[id].interview === null) {
+      if (id <= 5) {
+        days[0].spots--;
+      } else if (id <= 10) {
+        days[1].spots--;
+      } else if (id <= 15) {
+        days[2].spots--;
+      } else if (id <= 20) {
+        days[3].spots--;
+      } else {
+        days[4].spots--;
+      }
     }
-      
     
     return axios.put(`/api/appointments/${id}`, appointment)
     .then((response) => {
