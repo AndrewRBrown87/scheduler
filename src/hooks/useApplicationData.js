@@ -36,17 +36,13 @@ export default function useApplicationData() {
 
     //check that appointment is being added (not edited)
     if(state.appointments[id].interview === null) {
-      if (id <= 5) {
-        days[0].spots--;
-      } else if (id <= 10) {
-        days[1].spots--;
-      } else if (id <= 15) {
-        days[2].spots--;
-      } else if (id <= 20) {
-        days[3].spots--;
-      } else {
-        days[4].spots--;
+
+      for (let i = 0; i < state.days.length; i++){
+        if (state.days[i].appointments.includes(id)) {
+          days[i].spots--;
+        }
       }
+
     }
     
     return axios.put(`/api/appointments/${id}`, appointment)
@@ -75,16 +71,10 @@ export default function useApplicationData() {
       days[i] = {...state.days[i]};
     }
 
-    if (id <= 5) {
-      days[0].spots++;
-    } else if (id <= 10) {
-      days[1].spots++;
-    } else if (id <= 15) {
-      days[2].spots++;
-    } else if (id <= 20) {
-      days[3].spots++;
-    } else {
-      days[4].spots++;
+    for (let i = 0; i < state.days.length; i++){
+      if (state.days[i].appointments.includes(id)) {
+        days[i].spots++;
+      }
     }
 
     return axios.delete(`/api/appointments/${id}`, appointment)
